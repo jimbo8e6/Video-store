@@ -11,6 +11,9 @@ export default function GameModal({ game, onClose }) {
   const truncated = summary.length > 500 ? summary.slice(0, 500) + '…' : summary
   const rating = game.rating ? Math.round(game.rating) : null
   const coverUrl = igdbCoverUrl(game.cover?.image_id, 'cover_big')
+  const retroSearchUrl = year && year <= 1995
+    ? `https://www.google.com/search?q=site:retrogames.cc+${encodeURIComponent(game.name)}`
+    : null
 
   return (
     <div
@@ -124,6 +127,29 @@ export default function GameModal({ game, onClose }) {
                     ))}
                   </div>
                 </div>
+              )}
+
+              {retroSearchUrl && (
+                <a
+                  href={retroSearchUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="vhs-title mt-1"
+                  style={{
+                    display: 'inline-block',
+                    background: 'rgba(255,0,110,0.12)',
+                    border: '1px solid rgba(255,0,110,0.4)',
+                    color: '#ff006e',
+                    fontSize: '11px',
+                    letterSpacing: '2px',
+                    borderRadius: '2px',
+                    padding: '4px 8px',
+                    textDecoration: 'none',
+                    textShadow: '0 0 6px rgba(255,0,110,0.5)',
+                  }}
+                >
+                  🕹 PLAY IN BROWSER
+                </a>
               )}
             </div>
           </div>
