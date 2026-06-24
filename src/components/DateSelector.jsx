@@ -7,6 +7,8 @@ const QUICK_DATES = [
   { label: 'SUMMER \'99', date: '1999-08-01', desc: 'Blair Witch, Sixth Sense era' },
 ]
 
+const TODAY = new Date().toISOString().slice(0, 10)
+
 export default function DateSelector({ onSelectDate }) {
   const [date, setDate] = useState('')
 
@@ -102,7 +104,7 @@ export default function DateSelector({ onSelectDate }) {
             type="date"
             value={date}
             min="1970-01-01"
-            max="2010-12-31"
+            max={TODAY}
             onChange={e => setDate(e.target.value)}
             className="w-full px-4 py-3 text-center vhs-title"
             style={{
