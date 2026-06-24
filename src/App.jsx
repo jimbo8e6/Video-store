@@ -9,9 +9,9 @@ function App() {
   const [apiKeys, setApiKeys] = useState(() => {
     try {
       const stored = localStorage.getItem('videostore_keys')
-      return stored ? JSON.parse(stored) : { tmdb: '', igdb_client: '', igdb_secret: '' }
+      return stored ? JSON.parse(stored) : { tmdb: '', rawg: '' }
     } catch {
-      return { tmdb: '', igdb_client: '', igdb_secret: '' }
+      return { tmdb: '', rawg: '' }
     }
   })
   const [showSetup, setShowSetup] = useState(false)

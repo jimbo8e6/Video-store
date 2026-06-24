@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchMoviesByDate } from '../lib/tmdb'
-import { fetchGamesByDate } from '../lib/igdb'
+import { fetchGamesByDate } from '../lib/rawg'
 import CoverCard from './CoverCard'
 import { format, parseISO } from 'date-fns'
 
@@ -118,13 +118,13 @@ export default function VideoStore({ date, apiKeys, onBack, onSetup }) {
   }, [date, apiKeys.tmdb])
 
   useEffect(() => {
-    if (!apiKeys.igdb_client || !apiKeys.igdb_secret) return
+    if (!apiKeys.rawg) return
     setGamesLoading(true)
-    fetchGamesByDate(apiKeys.igdb_client, apiKeys.igdb_secret, date)
+    fetchGamesByDate(apiKeys.rawg, date)
       .then(setGames)
       .catch(() => setGames([]))
       .finally(() => setGamesLoading(false))
-  }, [date, apiKeys.igdb_client, apiKeys.igdb_secret])
+  }, [date, apiKeys.rawg])
 
   return (
     <div>
@@ -196,9 +196,9 @@ export default function VideoStore({ date, apiKeys, onBack, onSetup }) {
       {/* GAMES SECTION */}
       <SectionLabel text="▶ GAMES" color="#ff006e" tapeDividerClass="game-tape-divider" />
 
-      {!apiKeys.igdb_client || !apiKeys.igdb_secret ? (
+      {!apiKeys.rawg ? (
         <EmptyShelf
-          message="Add your free Twitch/IGDB credentials to browse the games section. Great for retro classics."
+          message="Add your free RAWG API key to browse the games section. Sign up at rawg.io/apidocs."
           onSetup={onSetup}
         />
       ) : gamesLoading ? (

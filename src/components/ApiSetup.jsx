@@ -52,35 +52,19 @@ export default function ApiSetup({ initialKeys, onSave, onClose }) {
             />
           </div>
 
-          {/* IGDB */}
+          {/* RAWG */}
           <div>
             <label className="block vhs-title mb-2" style={{ color: '#ff006e', fontSize: '16px', letterSpacing: '2px' }}>
-              IGDB / TWITCH CREDENTIALS <span style={{ color: '#666', fontSize: '12px' }}>(optional)</span>
+              RAWG API KEY <span style={{ color: '#666', fontSize: '12px' }}>(optional)</span>
             </label>
             <p className="text-xs mb-2" style={{ color: '#666', fontFamily: "'Special Elite', cursive" }}>
-              Free at dev.twitch.tv — create an app to get Client ID + Secret. Used for game covers.
+              Free at rawg.io/apidocs — just sign up and grab your key. Used for game covers & data.
             </p>
             <input
               type="text"
-              placeholder="Twitch Client ID..."
-              value={keys.igdb_client}
-              onChange={e => setKeys(k => ({ ...k, igdb_client: e.target.value }))}
-              className="w-full px-3 py-2 mb-2"
-              style={{
-                background: '#050510',
-                border: '1px solid #ff006e',
-                color: '#e0e0e0',
-                fontFamily: 'monospace',
-                fontSize: '13px',
-                borderRadius: '3px',
-                outline: 'none',
-              }}
-            />
-            <input
-              type="password"
-              placeholder="Twitch Client Secret..."
-              value={keys.igdb_secret}
-              onChange={e => setKeys(k => ({ ...k, igdb_secret: e.target.value }))}
+              placeholder="Enter your RAWG API key..."
+              value={keys.rawg || ''}
+              onChange={e => setKeys(k => ({ ...k, rawg: e.target.value }))}
               className="w-full px-3 py-2"
               style={{
                 background: '#050510',
