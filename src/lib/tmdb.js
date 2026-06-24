@@ -5,6 +5,30 @@ const IMG_BASE = 'https://image.tmdb.org/t/p'
 // Falls back to whatever the user typed into the settings modal.
 export const BAKED_TMDB_KEY = import.meta.env.VITE_TMDB_API_KEY || ''
 
+export function detectCountry() {
+  const lang = navigator.language || navigator.languages?.[0] || ''
+  const parts = lang.split('-')
+  if (parts.length >= 2) return parts[parts.length - 1].toUpperCase()
+  const map = { en: 'US', fr: 'FR', de: 'DE', es: 'ES', it: 'IT', pt: 'BR', nl: 'NL', sv: 'SE', da: 'DK', no: 'NO', fi: 'FI', pl: 'PL', ja: 'JP', ko: 'KR', zh: 'CN' }
+  return map[parts[0]] || 'US'
+}
+
+export async function fetchWatchProviders(apiKey, movieId) {
+  const key = apiKey || BAKED_TMDB_KEY
+  if (!key) return null
+  const country = detectCountry()
+  const res = await fetch(`${BASE}/movie/${movieId}/watch/providers?api_key=${key}`)
+  if (!res.ok) return null
+  const data = await res.json()
+  const result = data.results?.[country] || null
+  // If nothing for detected country, fall back to US
+  if (!result && country !== 'US') return data.results?.['US'] || null
+  return result
+}
+
+export const providerLogoUrl = (path) =>
+  path ? `${IMG_BASE}/w92${path}` : null
+
 export const posterUrl = (path, size = 'w500') =>
   path ? `${IMG_BASE}/${size}${path}` : null
 

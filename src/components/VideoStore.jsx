@@ -187,7 +187,7 @@ function EmptyShelf({ message, onSetup }) {
   )
 }
 
-function Shelf({ items, type, loading, loadingLabel, error, noKeyMessage, onSetup, sortBy, sorter }) {
+function Shelf({ items, type, loading, loadingLabel, error, noKeyMessage, onSetup, sortBy, sorter, tmdbKey }) {
   const sorted = useMemo(() => sorter(items, sortBy), [items, sortBy, sorter])
   const isMovie = type === 'movie'
   const color = isMovie ? '#00f3ff' : '#ff006e'
@@ -214,7 +214,7 @@ function Shelf({ items, type, loading, loadingLabel, error, noKeyMessage, onSetu
             style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}
           >
             {sorted.map(item => (
-              <CoverCard key={item.id} item={item} type={type} />
+              <CoverCard key={item.id} item={item} type={type} tmdbKey={tmdbKey} />
             ))}
           </div>
         </div>
@@ -267,6 +267,7 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
       onSetup={!tmdbKey ? onSetup : null}
       sortBy={sortBy}
       sorter={sortMovies}
+      tmdbKey={tmdbKey}
     />
   )
 
@@ -281,6 +282,7 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
       onSetup={!hasIgdb ? onSetup : null}
       sortBy={sortBy}
       sorter={sortGames}
+      tmdbKey={tmdbKey}
     />
   )
 
