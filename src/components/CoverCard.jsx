@@ -138,7 +138,7 @@ export default function CoverCard({ item, type }) {
   return (
     <div
       className={`cover-card ${flipped ? 'flipped' : ''}`}
-      style={{ height: '210px' }}
+      style={{ aspectRatio: '2 / 3' }}
       onClick={() => setFlipped(f => !f)}
     >
       <div className="cover-inner">

@@ -185,8 +185,8 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
       ) : (
         <div className="shelf-row px-4 py-6">
           <div
-            className="grid gap-4"
-            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))' }}
+            className="grid gap-2 sm:gap-4"
+            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}
           >
             {movies.map(movie => (
               <CoverCard key={movie.id} item={movie} type="movie" />
@@ -210,8 +210,8 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
       ) : (
         <div className="shelf-row px-4 py-6">
           <div
-            className="grid gap-4"
-            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))' }}
+            className="grid gap-2 sm:gap-4"
+            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}
           >
             {games.map(game => (
               <CoverCard key={game.id} item={game} type="game" />
