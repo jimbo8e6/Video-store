@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Oswald:wght@400;600;700&family=Special+Elite&display=swap');
+
+@import "tailwindcss";
+
+:root {
+  --neon-blue: #00f3ff;
+  --neon-pink: #ff006e;
+  --neon-yellow: #ffe600;
+  --vhs-dark: #0a0a0f;
+  --vhs-purple: #1a0a2e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--vhs-dark);
+  color: #e0e0e0;
+  font-family: 'Oswald', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* CRT scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* CRT vignette */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.vhs-title {
+  font-family: 'VT323', monospace;
+}
+
+.special-elite {
+  font-family: 'Special Elite', cursive;
+}
+
+.neon-blue {
+  color: var(--neon-blue);
+  text-shadow: 0 0 8px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
+}
+.neon-pink {
+  color: var(--neon-pink);
+  text-shadow: 0 0 8px var(--neon-pink), 0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink);
+}
+.neon-yellow {
+  color: var(--neon-yellow);
+  text-shadow: 0 0 8px var(--neon-yellow), 0 0 20px var(--neon-yellow);
+}
+
+.cover-card {
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.cover-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.cover-card.flipped .cover-inner {
+  transform: rotateY(180deg);
+}
+
+.cover-front,
+.cover-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.cover-back {
+  transform: rotateY(180deg);
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.92; }
+  75% { opacity: 0.95; }
+}
+
+.flicker {
+  animation: flicker 3s infinite;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0f; }
+::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 3px; }
+
+.tape-divider {
+  height: 28px;
+  background: var(--neon-yellow);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+.tape-divider::before {
+  content: 'VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆ VHS ◆';
+  white-space: nowrap;
+  color: #0a0a0f;
+  font-family: 'VT323', monospace;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.game-tape-divider::before {
+  content: 'GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆ GAME ◆';
+  color: #0a0a0f;
+}
+
+.game-tape-divider {
+  background: var(--neon-pink);
+}
+
+.shelf-row {
+  position: relative;
+  padding-bottom: 4px;
+}
+.shelf-row::after {
+  content: '';
+  display: block;
+  height: 12px;
+  background: linear-gradient(180deg, #3d2a00 0%, #1a0d00 50%, #0d0700 100%);
+  border-top: 3px solid #8b6914;
+  margin-top: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+}
+
+input[type="date"] {
+  color-scheme: dark;
+}
+
+@keyframes rewind {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.loading-bar {
+  animation: rewind 1.5s ease-in-out infinite;
+}
