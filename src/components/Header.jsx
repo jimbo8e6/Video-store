@@ -1,4 +1,4 @@
-export default function Header({ onSetup }) {
+export default function Header({ onSetup, showSetupButton }) {
   return (
     <header
       className="relative flex items-center justify-between px-6 py-4"
@@ -39,10 +39,11 @@ export default function Header({ onSetup }) {
         </p>
       </div>
 
-      {/* Right: settings */}
+      {/* Right: settings — only shown when keys aren't fully configured */}
       <button
         onClick={onSetup}
         title="API Settings"
+        style={{ visibility: showSetupButton ? 'visible' : 'hidden' }}
         className="flex items-center gap-2 px-3 py-2 rounded transition-all duration-200"
         style={{
           background: 'rgba(0,243,255,0.1)',

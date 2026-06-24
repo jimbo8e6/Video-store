@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function ApiSetup({ initialKeys, onSave, onClose }) {
+export default function ApiSetup({ initialKeys, serverConfig, onSave, onClose }) {
   const [keys, setKeys] = useState(initialKeys)
 
   const handleSave = () => {
@@ -57,9 +57,15 @@ export default function ApiSetup({ initialKeys, onSave, onClose }) {
             <label className="block vhs-title mb-2" style={{ color: '#ff006e', fontSize: '16px', letterSpacing: '2px' }}>
               IGDB / TWITCH CREDENTIALS <span style={{ color: '#666', fontSize: '12px' }}>(optional)</span>
             </label>
-            <p className="text-xs mb-2" style={{ color: '#666', fontFamily: "'Special Elite', cursive" }}>
-              Free at dev.twitch.tv — create an app to get Client ID + Secret. Used for game covers.
-            </p>
+            {serverConfig?.igdbConfigured ? (
+              <p className="text-xs mb-2" style={{ color: '#00f3ff', fontFamily: "'Special Elite', cursive" }}>
+                ✓ Configured via server environment — games will load automatically. You don't need to enter anything here.
+              </p>
+            ) : (
+              <p className="text-xs mb-2" style={{ color: '#666', fontFamily: "'Special Elite', cursive" }}>
+                Free at dev.twitch.tv — create an app to get Client ID + Secret. Used for game covers.
+              </p>
+            )}
             <input
               type="text"
               placeholder="Twitch Client ID..."

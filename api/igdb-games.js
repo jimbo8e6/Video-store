@@ -4,7 +4,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { clientId, clientSecret, query } = req.body
+    const { clientId: bodyClientId, clientSecret: bodyClientSecret, query } = req.body
+
+    // Prefer server-side env vars; fall back to credentials sent from the client
+    const clientId = process.env.IGDB_CLIENT_ID || bodyClientId
+    const clientSecret = process.env.IGDB_CLIENT_SECRET || bodyClientSecret
+
+    if (!clientId || !clientSecret) {
+      return res.status(400).json({ error: 'No IGDB credentials available' })
+    }
 
     const tokenRes = await fetch(
       `https://id.twitch.tv/oauth2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`,

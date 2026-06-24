@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import DateSelector from './components/DateSelector'
 import VideoStore from './components/VideoStore'
 import ApiSetup from './components/ApiSetup'
+import { BAKED_TMDB_KEY } from './lib/tmdb'
 
 function App() {
   const [selectedDate, setSelectedDate] = useState(null)
@@ -15,6 +16,14 @@ function App() {
     }
   })
   const [showSetup, setShowSetup] = useState(false)
+  const [serverConfig, setServerConfig] = useState({ igdbConfigured: false })
+
+  useEffect(() => {
+    fetch('/api/config')
+      .then(r => r.json())
+      .then(setServerConfig)
+      .catch(() => {}) // silently fails in local dev without the function
+  }, [])
 
   const handleSaveKeys = (keys) => {
     localStorage.setItem('videostore_keys', JSON.stringify(keys))
@@ -22,13 +31,17 @@ function App() {
     setShowSetup(false)
   }
 
+  const hasTmdb = !!(apiKeys.tmdb || BAKED_TMDB_KEY)
+  const hasIgdb = !!(serverConfig.igdbConfigured || apiKeys.igdb_client)
+
   return (
     <div className="min-h-screen" style={{ background: '#0a0a0f' }}>
-      <Header onSetup={() => setShowSetup(true)} />
+      <Header onSetup={() => setShowSetup(true)} showSetupButton={!hasTmdb || !hasIgdb} />
 
       {showSetup && (
         <ApiSetup
           initialKeys={apiKeys}
+          serverConfig={serverConfig}
           onSave={handleSaveKeys}
           onClose={() => setShowSetup(false)}
         />
@@ -40,6 +53,7 @@ function App() {
         <VideoStore
           date={selectedDate}
           apiKeys={apiKeys}
+          serverConfig={serverConfig}
           onBack={() => setSelectedDate(null)}
           onSetup={() => setShowSetup(true)}
         />

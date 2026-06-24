@@ -1,6 +1,4 @@
 export async function fetchGamesByDate(clientId, clientSecret, dateStr) {
-  if (!clientId || !clientSecret) return []
-
   const date = new Date(dateStr)
   const toTs = Math.floor(date.getTime() / 1000)
   const fromTs = toTs - 2 * 365 * 24 * 3600
@@ -15,10 +13,11 @@ export async function fetchGamesByDate(clientId, clientSecret, dateStr) {
     limit 40;
   `
 
+  // clientId/clientSecret may be empty — the server will use its env vars instead
   const res = await fetch('/api/igdb-games', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ clientId, clientSecret, query }),
+    body: JSON.stringify({ clientId: clientId || '', clientSecret: clientSecret || '', query }),
   })
 
   if (!res.ok) return []

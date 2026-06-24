@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchMoviesByDate } from '../lib/tmdb'
+import { fetchMoviesByDate, BAKED_TMDB_KEY } from '../lib/tmdb'
 import { fetchGamesByDate } from '../lib/igdb'
 import CoverCard from './CoverCard'
 import { format, parseISO } from 'date-fns'
@@ -98,7 +98,7 @@ function EmptyShelf({ message, onSetup }) {
   )
 }
 
-export default function VideoStore({ date, apiKeys, onBack, onSetup }) {
+export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetup }) {
   const [movies, setMovies] = useState([])
   const [games, setGames] = useState([])
   const [moviesLoading, setMoviesLoading] = useState(false)
@@ -106,25 +106,27 @@ export default function VideoStore({ date, apiKeys, onBack, onSetup }) {
   const [moviesError, setMoviesError] = useState(null)
 
   const displayDate = format(parseISO(date), 'MMMM d, yyyy')
+  const tmdbKey = apiKeys.tmdb || BAKED_TMDB_KEY
+  const hasIgdb = !!(serverConfig?.igdbConfigured || apiKeys.igdb_client)
 
   useEffect(() => {
-    if (!apiKeys.tmdb) return
+    if (!tmdbKey) return
     setMoviesLoading(true)
     setMoviesError(null)
-    fetchMoviesByDate(apiKeys.tmdb, date)
+    fetchMoviesByDate(tmdbKey, date)
       .then(setMovies)
       .catch(e => setMoviesError(e.message))
       .finally(() => setMoviesLoading(false))
-  }, [date, apiKeys.tmdb])
+  }, [date, tmdbKey])
 
   useEffect(() => {
-    if (!apiKeys.igdb_client || !apiKeys.igdb_secret) return
+    if (!hasIgdb) return
     setGamesLoading(true)
-    fetchGamesByDate(apiKeys.igdb_client, apiKeys.igdb_secret, date)
+    fetchGamesByDate(apiKeys.igdb_client || '', apiKeys.igdb_secret || '', date)
       .then(setGames)
       .catch(() => setGames([]))
       .finally(() => setGamesLoading(false))
-  }, [date, apiKeys.igdb_client, apiKeys.igdb_secret])
+  }, [date, hasIgdb, apiKeys.igdb_client, apiKeys.igdb_secret])
 
   return (
     <div>
@@ -169,7 +171,7 @@ export default function VideoStore({ date, apiKeys, onBack, onSetup }) {
       {/* MOVIES SECTION */}
       <SectionLabel text="▶ VHS · MOVIES" color="#00f3ff" />
 
-      {!apiKeys.tmdb ? (
+      {!tmdbKey ? (
         <EmptyShelf
           message="Add your free TMDB API key to browse the movie shelves. It only takes a minute to sign up."
           onSetup={onSetup}
@@ -196,7 +198,7 @@ export default function VideoStore({ date, apiKeys, onBack, onSetup }) {
       {/* GAMES SECTION */}
       <SectionLabel text="▶ GAMES" color="#ff006e" tapeDividerClass="game-tape-divider" />
 
-      {!apiKeys.igdb_client || !apiKeys.igdb_secret ? (
+      {!hasIgdb ? (
         <EmptyShelf
           message="Add your Twitch Client ID and Secret to browse the games section. Free at dev.twitch.tv."
           onSetup={onSetup}
