@@ -8,9 +8,7 @@ export async function fetchGamesByDate(clientId, clientSecret, dateStr) {
     where first_release_date >= ${fromTs}
       & first_release_date <= ${toTs}
       & cover != null
-      & rating_count > 5
-      & category != 5
-      & category != 12;
+      & rating_count > 5;
     sort rating desc;
     limit 40;
   `
