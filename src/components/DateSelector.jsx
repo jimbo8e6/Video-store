@@ -94,24 +94,33 @@ export default function DateSelector({ onSelectDate }) {
 
       {/* Date form */}
       <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4 w-full max-w-sm">
-        <input
-          type="date"
-          value={date}
-          min="1970-01-01"
-          max="2010-12-31"
-          onChange={e => setDate(e.target.value)}
-          className="w-full px-4 py-3 text-center vhs-title"
-          style={{
-            background: '#0a0a1a',
-            border: '2px solid #00f3ff',
-            borderRadius: '4px',
-            color: '#00f3ff',
-            fontSize: '28px',
-            letterSpacing: '4px',
-            boxShadow: '0 0 20px rgba(0,243,255,0.2), inset 0 0 10px rgba(0,243,255,0.05)',
-            outline: 'none',
-          }}
-        />
+        <div className="w-full">
+          <div className="vhs-title text-center mb-2" style={{ color: '#555', fontSize: '13px', letterSpacing: '3px' }}>
+            PICK A DATE
+          </div>
+          <input
+            type="date"
+            value={date}
+            min="1970-01-01"
+            max="2010-12-31"
+            onChange={e => setDate(e.target.value)}
+            className="w-full px-4 py-3 text-center vhs-title"
+            style={{
+              background: '#0a0a1a',
+              border: '2px solid #00f3ff',
+              borderRadius: '4px',
+              color: date ? '#00f3ff' : '#2a4a5a',
+              fontSize: '28px',
+              letterSpacing: '4px',
+              boxShadow: '0 0 20px rgba(0,243,255,0.2), inset 0 0 10px rgba(0,243,255,0.05)',
+              outline: 'none',
+              colorScheme: 'dark',
+            }}
+          />
+          <div className="vhs-title text-center mt-2" style={{ color: '#2a3a4a', fontSize: '12px', letterSpacing: '2px' }}>
+            {date ? '' : 'YYYY – MM – DD'}
+          </div>
+        </div>
 
         <button
           type="submit"

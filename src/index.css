@@ -125,9 +125,6 @@ body::after {
   box-shadow: 0 4px 12px rgba(0,0,0,0.8);
 }
 
-input[type="date"] {
-  color-scheme: dark;
-}
 
 @keyframes rewind {
   0% { width: 0%; }
