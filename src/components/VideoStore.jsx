@@ -258,7 +258,7 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
   const [moviesLoading, setMoviesLoading] = useState(false)
   const [gamesLoading, setGamesLoading] = useState(false)
   const [moviesError, setMoviesError] = useState(null)
-  const [sortBy, setSortBy] = useState('popular')
+  const [sortBy, setSortBy] = useState('newest')
   const [filmsFirst, setFilmsFirst] = useState(true)
   const [genreFilter, setGenreFilter] = useState(null)
 
