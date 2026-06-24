@@ -21,7 +21,7 @@ export const GENRE_MAP = {
   53: 'Thriller', 10752: 'War', 37: 'Western',
 }
 
-(apiKey, movieId) {
+export async function fetchWatchProviders(apiKey, movieId) {
   const key = apiKey || BAKED_TMDB_KEY
   if (!key) return null
   const country = detectCountry()
