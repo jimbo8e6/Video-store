@@ -1,14 +1,12 @@
 import { useState } from 'react'
 import { posterUrl } from '../lib/tmdb'
-import { gbCoverUrl } from '../lib/giantbomb'
+import { igdbCoverUrl } from '../lib/igdb'
 
 function VhsBack({ item, type }) {
   const isMovie = type === 'movie'
-  // GiantBomb: deck = short description; movies use overview
-  const overview = item.overview || item.deck || ''
+  const overview = item.overview || item.summary || ''
   const truncated = overview.length > 350 ? overview.slice(0, 350) + '...' : overview
 
-  // GiantBomb: genres is [{id, name}], platforms is [{id, name}]
   const genres = (item.genres || []).map(g => g.name)
 
   const platforms = !isMovie
@@ -21,7 +19,9 @@ function VhsBack({ item, type }) {
 
   const year = isMovie
     ? item.release_date?.slice(0, 4)
-    : item.original_release_date?.slice(0, 4) || null
+    : item.first_release_date
+      ? new Date(item.first_release_date * 1000).getFullYear()
+      : null
 
   return (
     <div
@@ -131,7 +131,7 @@ export default function CoverCard({ item, type }) {
 
   const imgSrc = isMovie
     ? posterUrl(item.poster_path, 'w342')
-    : gbCoverUrl(item)
+    : igdbCoverUrl(item.cover?.image_id)
 
   const title = item.title || item.name
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchMoviesByDate } from '../lib/tmdb'
-import { fetchGamesByDate } from '../lib/giantbomb'
+import { fetchGamesByDate } from '../lib/igdb'
 import CoverCard from './CoverCard'
 import { format, parseISO } from 'date-fns'
 
@@ -118,13 +118,13 @@ export default function VideoStore({ date, apiKeys, onBack, onSetup }) {
   }, [date, apiKeys.tmdb])
 
   useEffect(() => {
-    if (!apiKeys.rawg) return
+    if (!apiKeys.igdb_client || !apiKeys.igdb_secret) return
     setGamesLoading(true)
-    fetchGamesByDate(apiKeys.rawg, date)
+    fetchGamesByDate(apiKeys.igdb_client, apiKeys.igdb_secret, date)
       .then(setGames)
       .catch(() => setGames([]))
       .finally(() => setGamesLoading(false))
-  }, [date, apiKeys.rawg])
+  }, [date, apiKeys.igdb_client, apiKeys.igdb_secret])
 
   return (
     <div>
@@ -196,9 +196,9 @@ export default function VideoStore({ date, apiKeys, onBack, onSetup }) {
       {/* GAMES SECTION */}
       <SectionLabel text="▶ GAMES" color="#ff006e" tapeDividerClass="game-tape-divider" />
 
-      {!apiKeys.rawg ? (
+      {!apiKeys.igdb_client || !apiKeys.igdb_secret ? (
         <EmptyShelf
-          message="Add your free GiantBomb API key to browse the games section. Sign up at giantbomb.com/api."
+          message="Add your Twitch Client ID and Secret to browse the games section. Free at dev.twitch.tv."
           onSetup={onSetup}
         />
       ) : gamesLoading ? (

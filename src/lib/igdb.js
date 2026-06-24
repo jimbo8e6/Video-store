@@ -1,56 +1,24 @@
-// IGDB requires server-side auth (Twitch OAuth).
-// We use a CORS proxy approach: get token client-side then call IGDB.
-// Note: IGDB blocks direct browser calls — we route through a public proxy.
-const PROXY = 'https://api.igdb.com/v4'
-
-let cachedToken = null
-let tokenExpiry = 0
-
-export async function getIgdbToken(clientId, clientSecret) {
-  if (cachedToken && Date.now() < tokenExpiry) return cachedToken
-  const res = await fetch(
-    `https://id.twitch.tv/oauth2/token?client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`,
-    { method: 'POST' }
-  )
-  if (!res.ok) throw new Error('Failed to get IGDB token')
-  const data = await res.json()
-  cachedToken = data.access_token
-  tokenExpiry = Date.now() + (data.expires_in - 60) * 1000
-  return cachedToken
-}
-
 export async function fetchGamesByDate(clientId, clientSecret, dateStr) {
   if (!clientId || !clientSecret) return []
 
-  let token
-  try {
-    token = await getIgdbToken(clientId, clientSecret)
-  } catch {
-    return []
-  }
-
   const date = new Date(dateStr)
-  const toTimestamp = Math.floor(date.getTime() / 1000)
-  const fromTimestamp = toTimestamp - 2 * 365 * 24 * 3600
+  const toTs = Math.floor(date.getTime() / 1000)
+  const fromTs = toTs - 2 * 365 * 24 * 3600
 
-  const body = `
+  const query = `
     fields name, cover.image_id, summary, first_release_date, genres.name, platforms.name;
-    where first_release_date >= ${fromTimestamp}
-      & first_release_date <= ${toTimestamp}
+    where first_release_date >= ${fromTs}
+      & first_release_date <= ${toTs}
       & cover != null
       & rating_count > 5;
     sort rating desc;
     limit 40;
   `
 
-  const res = await fetch(`${PROXY}/games`, {
+  const res = await fetch('/api/igdb-games', {
     method: 'POST',
-    headers: {
-      'Client-ID': clientId,
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'text/plain',
-    },
-    body,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ clientId, clientSecret, query }),
   })
 
   if (!res.ok) return []
