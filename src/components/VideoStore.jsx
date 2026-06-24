@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchMoviesByDate } from '../lib/tmdb'
-import { fetchGamesByDate } from '../lib/rawg'
+import { fetchGamesByDate } from '../lib/giantbomb'
 import CoverCard from './CoverCard'
 import { format, parseISO } from 'date-fns'
 
@@ -198,7 +198,7 @@ export default function VideoStore({ date, apiKeys, onBack, onSetup }) {
 
       {!apiKeys.rawg ? (
         <EmptyShelf
-          message="Add your free RAWG API key to browse the games section. Sign up at rawg.io/apidocs."
+          message="Add your free GiantBomb API key to browse the games section. Sign up at giantbomb.com/api."
           onSetup={onSetup}
         />
       ) : gamesLoading ? (

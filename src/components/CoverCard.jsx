@@ -1,28 +1,27 @@
 import { useState } from 'react'
 import { posterUrl } from '../lib/tmdb'
-import { rawgCoverUrl } from '../lib/rawg'
+import { gbCoverUrl } from '../lib/giantbomb'
 
 function VhsBack({ item, type }) {
   const isMovie = type === 'movie'
-  const overview = item.overview || item.description_raw || ''
+  // GiantBomb: deck = short description; movies use overview
+  const overview = item.overview || item.deck || ''
   const truncated = overview.length > 350 ? overview.slice(0, 350) + '...' : overview
 
-  // RAWG: genres is [{id, name, slug}], platforms is [{platform: {name}}]
-  const genres = isMovie
-    ? (item.genres || []).map(g => g.name)
-    : (item.genres || []).map(g => g.name)
+  // GiantBomb: genres is [{id, name}], platforms is [{id, name}]
+  const genres = (item.genres || []).map(g => g.name)
 
   const platforms = !isMovie
-    ? (item.platforms || []).slice(0, 3).map(p => p.platform?.name || p.name)
+    ? (item.platforms || []).slice(0, 3).map(p => p.name)
     : []
 
   const rating = isMovie
     ? item.vote_average ? `${item.vote_average.toFixed(1)} / 10` : null
-    : item.rating ? `${item.rating.toFixed(1)} / 5` : null
+    : null
 
   const year = isMovie
     ? item.release_date?.slice(0, 4)
-    : item.released?.slice(0, 4) || null
+    : item.original_release_date?.slice(0, 4) || null
 
   return (
     <div
@@ -132,7 +131,7 @@ export default function CoverCard({ item, type }) {
 
   const imgSrc = isMovie
     ? posterUrl(item.poster_path, 'w342')
-    : rawgCoverUrl(item)
+    : gbCoverUrl(item)
 
   const title = item.title || item.name
 

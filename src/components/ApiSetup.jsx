@@ -55,14 +55,14 @@ export default function ApiSetup({ initialKeys, onSave, onClose }) {
           {/* RAWG */}
           <div>
             <label className="block vhs-title mb-2" style={{ color: '#ff006e', fontSize: '16px', letterSpacing: '2px' }}>
-              RAWG API KEY <span style={{ color: '#666', fontSize: '12px' }}>(optional)</span>
+              GIANTBOMB API KEY <span style={{ color: '#666', fontSize: '12px' }}>(optional)</span>
             </label>
             <p className="text-xs mb-2" style={{ color: '#666', fontFamily: "'Special Elite', cursive" }}>
-              Free at rawg.io/apidocs — just sign up and grab your key. Used for game covers & data.
+              Free at giantbomb.com/api — register, then grab your key from your profile. Used for game covers & data.
             </p>
             <input
               type="text"
-              placeholder="Enter your RAWG API key..."
+              placeholder="Enter your GiantBomb API key..."
               value={keys.rawg || ''}
               onChange={e => setKeys(k => ({ ...k, rawg: e.target.value }))}
               className="w-full px-3 py-2"
