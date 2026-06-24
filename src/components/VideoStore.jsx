@@ -210,8 +210,7 @@ function Shelf({ items, type, loading, loadingLabel, error, noKeyMessage, onSetu
       ) : (
         <div className="shelf-row px-4 py-6">
           <div
-            className="grid gap-2 sm:gap-4"
-            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}
+            className="grid gap-2 sm:gap-4 [grid-template-columns:repeat(auto-fill,minmax(100px,1fr))] sm:[grid-template-columns:repeat(auto-fill,minmax(130px,1fr))]"
           >
             {sorted.map(item => (
               <CoverCard key={item.id} item={item} type={type} tmdbKey={tmdbKey} />

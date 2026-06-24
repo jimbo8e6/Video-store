@@ -110,9 +110,6 @@ function VhsBack({ item, type, onWatch }) {
         </button>
       )}
 
-      <div className="flex-shrink-0 mt-1 text-center vhs-title" style={{ color: '#333', fontSize: '8px', letterSpacing: '2px' }}>
-        TAP TO FLIP
-      </div>
     </div>
   )
 }
