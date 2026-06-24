@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { fetchMoviesByDate, BAKED_TMDB_KEY } from '../lib/tmdb'
+import { fetchMoviesByDate, BAKED_TMDB_KEY, GENRE_MAP } from '../lib/tmdb'
 import { fetchGamesByDate } from '../lib/igdb'
 import CoverCard from './CoverCard'
 import { format, parseISO } from 'date-fns'
@@ -27,7 +27,7 @@ function sortGames(games, sortBy) {
   return arr.sort((a, b) => (b.rating || 0) - (a.rating || 0))
 }
 
-function FilterBar({ sortBy, onSort, filmsFirst, onToggleOrder }) {
+function FilterBar({ sortBy, onSort, filmsFirst, onToggleOrder, genres, genreFilter, onGenre }) {
   const btn = (active) => ({
     fontFamily: "'VT323', monospace",
     fontSize: '15px',
@@ -58,37 +58,67 @@ function FilterBar({ sortBy, onSort, filmsFirst, onToggleOrder }) {
     boxShadow: active ? '0 0 8px rgba(0,243,255,0.25)' : 'none',
   })
 
+  const genreBtn = (active) => ({
+    fontFamily: "'VT323', monospace",
+    fontSize: '14px',
+    letterSpacing: '1px',
+    cursor: 'pointer',
+    border: '1px solid',
+    borderRadius: '3px',
+    padding: '2px 8px',
+    transition: 'all 0.15s',
+    background: active ? 'rgba(0,243,255,0.12)' : 'transparent',
+    borderColor: active ? '#00f3ff' : '#2a2a2a',
+    color: active ? '#00f3ff' : '#444',
+    boxShadow: active ? '0 0 6px rgba(0,243,255,0.2)' : 'none',
+  })
+
   return (
     <div
-      className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3"
       style={{
         background: 'rgba(255,255,255,0.02)',
         borderBottom: '1px solid #1a1a2e',
       }}
     >
-      {/* Sort */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="vhs-title" style={{ color: '#444', fontSize: '13px', letterSpacing: '3px' }}>SORT</span>
-        <div className="flex gap-1 flex-wrap">
-          {SORT_OPTIONS.map(o => (
-            <button key={o.id} onClick={() => onSort(o.id)} style={btn(sortBy === o.id)}>
-              {o.label}
+      {/* Row 1: sort + section order */}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="vhs-title" style={{ color: '#444', fontSize: '13px', letterSpacing: '3px' }}>SORT</span>
+          <div className="flex gap-1 flex-wrap">
+            {SORT_OPTIONS.map(o => (
+              <button key={o.id} onClick={() => onSort(o.id)} style={btn(sortBy === o.id)}>
+                {o.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ width: '1px', height: '24px', background: '#222' }} className="hidden sm:block" />
+
+        <div className="flex items-center gap-2">
+          <span className="vhs-title" style={{ color: '#444', fontSize: '13px', letterSpacing: '3px' }}>SHOW</span>
+          <div className="flex gap-1">
+            <button onClick={() => onToggleOrder(true)}  style={toggleStyle(filmsFirst)}>📼 FILMS</button>
+            <button onClick={() => onToggleOrder(false)} style={toggleStyle(!filmsFirst)}>🕹 GAMES</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 2: genre filter (movies only, shown when genres are available) */}
+      {genres?.length > 0 && (
+        <div
+          className="flex flex-wrap items-center gap-2 px-4 py-2"
+          style={{ borderTop: '1px solid #111' }}
+        >
+          <span className="vhs-title" style={{ color: '#444', fontSize: '13px', letterSpacing: '3px' }}>GENRE</span>
+          <button onClick={() => onGenre(null)} style={genreBtn(!genreFilter)}>ALL</button>
+          {genres.map(g => (
+            <button key={g.id} onClick={() => onGenre(g.id)} style={genreBtn(genreFilter === g.id)}>
+              {g.name.toUpperCase()}
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Divider */}
-      <div style={{ width: '1px', height: '24px', background: '#222' }} className="hidden sm:block" />
-
-      {/* Order toggle */}
-      <div className="flex items-center gap-2">
-        <span className="vhs-title" style={{ color: '#444', fontSize: '13px', letterSpacing: '3px' }}>SHOW</span>
-        <div className="flex gap-1">
-          <button onClick={() => onToggleOrder(true)}  style={toggleStyle(filmsFirst)}>📼 FILMS</button>
-          <button onClick={() => onToggleOrder(false)} style={toggleStyle(!filmsFirst)}>🕹 GAMES</button>
-        </div>
-      </div>
+      )}
     </div>
   )
 }
@@ -230,15 +260,31 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
   const [moviesError, setMoviesError] = useState(null)
   const [sortBy, setSortBy] = useState('popular')
   const [filmsFirst, setFilmsFirst] = useState(true)
+  const [genreFilter, setGenreFilter] = useState(null)
 
   const displayDate = format(parseISO(date), 'MMMM d, yyyy')
   const tmdbKey = apiKeys.tmdb || BAKED_TMDB_KEY
   const hasIgdb = !!(serverConfig?.igdbConfigured || apiKeys.igdb_client)
 
+  const availableGenres = useMemo(() => {
+    const counts = {}
+    movies.forEach(m => (m.genre_ids || []).forEach(id => { counts[id] = (counts[id] || 0) + 1 }))
+    return Object.entries(counts)
+      .filter(([id]) => GENRE_MAP[id])
+      .sort((a, b) => b[1] - a[1])
+      .map(([id]) => ({ id: Number(id), name: GENRE_MAP[id] }))
+  }, [movies])
+
+  const filteredMovies = useMemo(() =>
+    genreFilter ? movies.filter(m => (m.genre_ids || []).includes(genreFilter)) : movies,
+    [movies, genreFilter]
+  )
+
   useEffect(() => {
     if (!tmdbKey) return
     setMoviesLoading(true)
     setMoviesError(null)
+    setGenreFilter(null)
     fetchMoviesByDate(tmdbKey, date)
       .then(setMovies)
       .catch(e => setMoviesError(e.message))
@@ -257,7 +303,7 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
   const movieShelf = (
     <Shelf
       key="movies"
-      items={movies}
+      items={filteredMovies}
       type="movie"
       loading={moviesLoading}
       loadingLabel="REWINDING TAPES..."
@@ -333,6 +379,9 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
         onSort={setSortBy}
         filmsFirst={filmsFirst}
         onToggleOrder={setFilmsFirst}
+        genres={availableGenres}
+        genreFilter={genreFilter}
+        onGenre={setGenreFilter}
       />
 
       {filmsFirst ? [movieShelf, gameShelf] : [gameShelf, movieShelf]}
