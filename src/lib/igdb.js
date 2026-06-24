@@ -4,7 +4,7 @@ export async function fetchGamesByDate(clientId, clientSecret, dateStr) {
   const fromTs = toTs - 2 * 365 * 24 * 3600
 
   const query = `
-    fields name, cover.image_id, summary, first_release_date, genres.name, platforms.name;
+    fields name, cover.image_id, summary, first_release_date, genres.name, platforms.name, rating;
     where first_release_date >= ${fromTs}
       & first_release_date <= ${toTs}
       & cover != null

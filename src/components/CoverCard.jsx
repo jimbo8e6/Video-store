@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { posterUrl } from '../lib/tmdb'
 import { igdbCoverUrl } from '../lib/igdb'
 import WatchModal from './WatchModal'
+import GameModal from './GameModal'
 
 function VhsBack({ item, type, onWatch }) {
   const isMovie = type === 'movie'
@@ -118,17 +119,23 @@ export default function CoverCard({ item, type, tmdbKey }) {
   const [flipped, setFlipped] = useState(false)
   const [imgError, setImgError] = useState(false)
   const [showWatch, setShowWatch] = useState(false)
+  const [showGame, setShowGame] = useState(false)
 
   const isMovie = type === 'movie'
   const imgSrc = isMovie ? posterUrl(item.poster_path, 'w342') : igdbCoverUrl(item.cover?.image_id)
   const title = item.title || item.name
 
+  const handleClick = () => {
+    if (isMovie) setFlipped(f => !f)
+    else setShowGame(true)
+  }
+
   return (
     <>
       <div
-        className={`cover-card ${flipped ? 'flipped' : ''}`}
+        className={`cover-card ${isMovie && flipped ? 'flipped' : ''}`}
         style={{ aspectRatio: '2 / 3' }}
-        onClick={() => setFlipped(f => !f)}
+        onClick={handleClick}
       >
         <div className="cover-inner">
           {/* FRONT */}
@@ -179,20 +186,22 @@ export default function CoverCard({ item, type, tmdbKey }) {
                 onMouseLeave={e => e.currentTarget.style.opacity = '0'}
               >
                 <span className="vhs-title" style={{ color: '#fff', fontSize: '12px', letterSpacing: '2px', textShadow: '0 0 8px rgba(255,255,255,0.5)' }}>
-                  READ BACK ▶
+                  {isMovie ? 'READ BACK ▶' : 'PRESS START ▶'}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* BACK */}
-          <div className="cover-back rounded overflow-hidden">
-            <VhsBack
-              item={item}
-              type={type}
-              onWatch={isMovie && tmdbKey ? () => setShowWatch(true) : null}
-            />
-          </div>
+          {/* BACK — movies only; games use the zoom modal instead */}
+          {isMovie && (
+            <div className="cover-back rounded overflow-hidden">
+              <VhsBack
+                item={item}
+                type={type}
+                onWatch={tmdbKey ? () => setShowWatch(true) : null}
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -202,6 +211,9 @@ export default function CoverCard({ item, type, tmdbKey }) {
           tmdbKey={tmdbKey}
           onClose={() => setShowWatch(false)}
         />
+      )}
+      {showGame && (
+        <GameModal game={item} onClose={() => setShowGame(false)} />
       )}
     </>
   )
