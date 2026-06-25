@@ -4,7 +4,7 @@ import { igdbCoverUrl } from '../lib/igdb'
 import MovieModal from './MovieModal'
 import GameModal from './GameModal'
 
-export default function CoverCard({ item, type, tmdbKey }) {
+export default function CoverCard({ item, type, tmdbKey, inWatchlist, onToggleWatchlist }) {
   const [imgError, setImgError] = useState(false)
   const [showModal, setShowModal] = useState(false)
 
@@ -79,7 +79,13 @@ export default function CoverCard({ item, type, tmdbKey }) {
       </div>
 
       {showModal && isMovie && (
-        <MovieModal movie={item} tmdbKey={tmdbKey} onClose={() => setShowModal(false)} />
+        <MovieModal
+          movie={item}
+          tmdbKey={tmdbKey}
+          onClose={() => setShowModal(false)}
+          inWatchlist={inWatchlist}
+          onToggleWatchlist={onToggleWatchlist}
+        />
       )}
       {showModal && !isMovie && (
         <GameModal game={item} onClose={() => setShowModal(false)} />

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { posterUrl } from '../lib/tmdb'
 import WatchModal from './WatchModal'
 
-export default function MovieModal({ movie, tmdbKey, onClose }) {
+export default function MovieModal({ movie, tmdbKey, onClose, inWatchlist, onToggleWatchlist }) {
   const [showWatch, setShowWatch] = useState(false)
 
   const title = movie.title
@@ -40,13 +40,36 @@ export default function MovieModal({ movie, tmdbKey, onClose }) {
             <div className="vhs-title" style={{ color: '#00f3ff', fontSize: '18px', letterSpacing: '3px', textShadow: '0 0 8px #00f3ff' }}>
               VHS · RENTAL
             </div>
-            <button
-              onClick={onClose}
-              className="vhs-title"
-              style={{ background: 'none', border: 'none', color: '#555', fontSize: '22px', cursor: 'pointer', padding: '0 4px', lineHeight: 1 }}
-            >
-              ✕
-            </button>
+            <div className="flex items-center gap-2">
+              {onToggleWatchlist && (
+                <button
+                  onClick={onToggleWatchlist}
+                  className="vhs-title"
+                  title={inWatchlist ? 'Remove from watch list' : 'Add to watch list'}
+                  style={{
+                    background: inWatchlist ? 'rgba(255,230,0,0.12)' : 'transparent',
+                    border: '1px solid',
+                    borderColor: inWatchlist ? '#ffe600' : '#333',
+                    borderRadius: '3px',
+                    color: inWatchlist ? '#ffe600' : '#555',
+                    fontSize: '20px',
+                    padding: '1px 8px',
+                    cursor: 'pointer',
+                    lineHeight: 1,
+                    textShadow: inWatchlist ? '0 0 6px rgba(255,230,0,0.5)' : 'none',
+                  }}
+                >
+                  {inWatchlist ? '♥' : '♡'}
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="vhs-title"
+                style={{ background: 'none', border: 'none', color: '#555', fontSize: '22px', cursor: 'pointer', padding: '0 4px', lineHeight: 1 }}
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Scrollable body */}

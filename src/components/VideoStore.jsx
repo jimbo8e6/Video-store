@@ -1,7 +1,9 @@
 import { useEffect, useState, useMemo } from 'react'
 import { fetchMoviesByDate, BAKED_TMDB_KEY, GENRE_MAP } from '../lib/tmdb'
 import { fetchGamesByDate } from '../lib/igdb'
+import { getWatchlist, saveWatchlist } from '../lib/watchlist'
 import CoverCard from './CoverCard'
+import WatchlistModal from './WatchlistModal'
 import { format, parseISO, addWeeks, subWeeks } from 'date-fns'
 
 const SORT_OPTIONS = [
@@ -217,7 +219,7 @@ function EmptyShelf({ message, onSetup }) {
   )
 }
 
-function Shelf({ items, type, loading, loadingLabel, error, noKeyMessage, onSetup, sortBy, sorter, tmdbKey }) {
+function Shelf({ items, type, loading, loadingLabel, error, noKeyMessage, onSetup, sortBy, sorter, tmdbKey, watchlist, onToggleWatchlist }) {
   const sorted = useMemo(() => sorter(items, sortBy), [items, sortBy, sorter])
   const isMovie = type === 'movie'
   const color = isMovie ? '#00f3ff' : '#ff006e'
@@ -243,7 +245,14 @@ function Shelf({ items, type, loading, loadingLabel, error, noKeyMessage, onSetu
             className="grid gap-2 sm:gap-4 [grid-template-columns:repeat(auto-fill,minmax(100px,1fr))] sm:[grid-template-columns:repeat(auto-fill,minmax(130px,1fr))]"
           >
             {sorted.map(item => (
-              <CoverCard key={item.id} item={item} type={type} tmdbKey={tmdbKey} />
+              <CoverCard
+                key={item.id}
+                item={item}
+                type={type}
+                tmdbKey={tmdbKey}
+                inWatchlist={watchlist?.some(m => m.id === item.id)}
+                onToggleWatchlist={onToggleWatchlist ? () => onToggleWatchlist(item) : undefined}
+              />
             ))}
           </div>
         </div>
@@ -261,6 +270,26 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
   const [sortBy, setSortBy] = useState('newest')
   const [filmsFirst, setFilmsFirst] = useState(true)
   const [genreFilter, setGenreFilter] = useState(null)
+  const [watchlist, setWatchlist] = useState(() => getWatchlist())
+  const [showWatchlist, setShowWatchlist] = useState(false)
+
+  const toggleWatchlist = (movie) => {
+    setWatchlist(prev => {
+      const next = prev.some(m => m.id === movie.id)
+        ? prev.filter(m => m.id !== movie.id)
+        : [...prev, movie]
+      saveWatchlist(next)
+      return next
+    })
+  }
+
+  const removeFromWatchlist = (movieId) => {
+    setWatchlist(prev => {
+      const next = prev.filter(m => m.id !== movieId)
+      saveWatchlist(next)
+      return next
+    })
+  }
 
   const displayDate = format(parseISO(date), 'MMMM d, yyyy')
   const today = new Date().toISOString().slice(0, 10)
@@ -317,6 +346,8 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
       sortBy={sortBy}
       sorter={sortMovies}
       tmdbKey={tmdbKey}
+      watchlist={watchlist}
+      onToggleWatchlist={toggleWatchlist}
     />
   )
 
@@ -393,12 +424,22 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
           </button>
         </div>
 
-        <div className="vhs-title text-right hidden sm:block" style={{ color: '#555', fontSize: '13px', letterSpacing: '2px', lineHeight: 1.8 }}>
-          <div>BE KIND</div>
-          <div>REWIND</div>
-        </div>
-        {/* Spacer on mobile to keep date centred */}
-        <div className="sm:hidden w-16" />
+        <button
+          onClick={() => setShowWatchlist(true)}
+          className="vhs-title flex items-center gap-1 px-3 sm:px-4 py-2 rounded"
+          style={{
+            background: watchlist.length > 0 ? 'rgba(255,230,0,0.1)' : 'rgba(255,255,255,0.03)',
+            border: '1px solid',
+            borderColor: watchlist.length > 0 ? 'rgba(255,230,0,0.4)' : 'rgba(255,255,255,0.08)',
+            color: watchlist.length > 0 ? '#ffe600' : '#333',
+            fontSize: 'clamp(13px, 3.5vw, 18px)',
+            letterSpacing: '2px',
+            cursor: 'pointer',
+            textShadow: watchlist.length > 0 ? '0 0 8px rgba(255,230,0,0.4)' : 'none',
+          }}
+        >
+          {watchlist.length > 0 ? '♥' : '♡'} <span className="hidden sm:inline">LIST </span>{watchlist.length > 0 ? `(${watchlist.length})` : ''}
+        </button>
       </div>
 
       {/* Filter bar */}
@@ -413,6 +454,14 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
       />
 
       {filmsFirst ? [movieShelf, gameShelf] : [gameShelf, movieShelf]}
+
+      {showWatchlist && (
+        <WatchlistModal
+          watchlist={watchlist}
+          onRemove={removeFromWatchlist}
+          onClose={() => setShowWatchlist(false)}
+        />
+      )}
 
       {/* Footer */}
       <div
