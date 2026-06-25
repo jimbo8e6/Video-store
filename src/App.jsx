@@ -56,6 +56,7 @@ function App() {
           serverConfig={serverConfig}
           onBack={() => setSelectedDate(null)}
           onSetup={() => setShowSetup(true)}
+          onDateChange={setSelectedDate}
         />
       )}
     </div>

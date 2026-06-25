@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { fetchMoviesByDate, BAKED_TMDB_KEY, GENRE_MAP } from '../lib/tmdb'
 import { fetchGamesByDate } from '../lib/igdb'
 import CoverCard from './CoverCard'
-import { format, parseISO } from 'date-fns'
+import { format, parseISO, addWeeks, subWeeks } from 'date-fns'
 
 const SORT_OPTIONS = [
   { id: 'popular', label: 'POPULAR' },
@@ -252,7 +252,7 @@ function Shelf({ items, type, loading, loadingLabel, error, noKeyMessage, onSetu
   )
 }
 
-export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetup }) {
+export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetup, onDateChange }) {
   const [movies, setMovies] = useState([])
   const [games, setGames] = useState([])
   const [moviesLoading, setMoviesLoading] = useState(false)
@@ -263,6 +263,10 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
   const [genreFilter, setGenreFilter] = useState(null)
 
   const displayDate = format(parseISO(date), 'MMMM d, yyyy')
+  const today = new Date().toISOString().slice(0, 10)
+  const prevWeek = format(subWeeks(parseISO(date), 1), 'yyyy-MM-dd')
+  const nextWeek = format(addWeeks(parseISO(date), 1), 'yyyy-MM-dd')
+  const canGoForward = nextWeek <= today
   const tmdbKey = apiKeys.tmdb || BAKED_TMDB_KEY
   const hasIgdb = !!(serverConfig?.igdbConfigured || apiKeys.igdb_client)
 
@@ -356,13 +360,37 @@ export default function VideoStore({ date, apiKeys, serverConfig, onBack, onSetu
           ◀ <span className="hidden sm:inline">CHANGE </span>DATE
         </button>
 
-        <div className="text-center">
-          <div className="vhs-title" style={{ color: '#ffe600', fontSize: 'clamp(10px, 2.5vw, 14px)', letterSpacing: '4px', textShadow: '0 0 8px #ffe600' }}>
-            YOU ARE BROWSING
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button
+            onClick={() => onDateChange(prevWeek)}
+            className="vhs-title flex flex-col items-center"
+            style={{ background: 'none', border: 'none', color: '#555', cursor: 'pointer', padding: '2px 4px', lineHeight: 1.2 }}
+            onMouseEnter={e => e.currentTarget.style.color = '#ffe600'}
+            onMouseLeave={e => e.currentTarget.style.color = '#555'}
+          >
+            <span style={{ fontSize: 'clamp(16px, 4vw, 22px)' }}>◀</span>
+            <span style={{ fontSize: '10px', letterSpacing: '1px' }}>WEEK</span>
+          </button>
+
+          <div className="text-center">
+            <div className="vhs-title" style={{ color: '#ffe600', fontSize: 'clamp(10px, 2.5vw, 14px)', letterSpacing: '4px', textShadow: '0 0 8px #ffe600' }}>
+              YOU ARE BROWSING
+            </div>
+            <div className="vhs-title" style={{ color: '#fff', fontSize: 'clamp(16px, 4.5vw, 28px)', letterSpacing: '2px' }}>
+              {displayDate.toUpperCase()}
+            </div>
           </div>
-          <div className="vhs-title" style={{ color: '#fff', fontSize: 'clamp(16px, 4.5vw, 28px)', letterSpacing: '2px' }}>
-            {displayDate.toUpperCase()}
-          </div>
+
+          <button
+            onClick={() => canGoForward && onDateChange(nextWeek)}
+            className="vhs-title flex flex-col items-center"
+            style={{ background: 'none', border: 'none', color: canGoForward ? '#555' : '#222', cursor: canGoForward ? 'pointer' : 'default', padding: '2px 4px', lineHeight: 1.2 }}
+            onMouseEnter={e => { if (canGoForward) e.currentTarget.style.color = '#ffe600' }}
+            onMouseLeave={e => { if (canGoForward) e.currentTarget.style.color = '#555' }}
+          >
+            <span style={{ fontSize: 'clamp(16px, 4vw, 22px)' }}>▶</span>
+            <span style={{ fontSize: '10px', letterSpacing: '1px' }}>WEEK</span>
+          </button>
         </div>
 
         <div className="vhs-title text-right hidden sm:block" style={{ color: '#555', fontSize: '13px', letterSpacing: '2px', lineHeight: 1.8 }}>
